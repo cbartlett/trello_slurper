@@ -1,0 +1,12 @@
+name: Sample story
+description: |
+  * Given
+  * When
+  * Then
+
+==
+name: Another sample story
+description: |
+  * Given
+  * When
+  * Then
