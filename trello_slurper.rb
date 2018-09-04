@@ -14,14 +14,9 @@ require 'yaml'
 include Trello
 include Trello::Authorization
 
+class Story < OpenStruct; end
+
 class TrelloSlurper
-  # change these
-  PUBLIC_KEY = ''
-  SECRET = ''
-  ACCESS_TOKEN_KEY = ''
-  BOARD_ID = ''
-  LIST_ID = ''
-  LABEL_COLOR = 'orange'
 
   def self.slurp(filename)
     new(filename).slurp
@@ -31,15 +26,14 @@ class TrelloSlurper
     configure_trello
     load_stories
     push_stories
-    add_labels
   end
 
   def board
-    @board ||= Board.find(BOARD_ID)
+    @board ||= Board.find(ENV['TRELLO_BOARD_ID'])
   end
 
   def list
-    @list ||= List.find(LIST_ID)
+    @list ||= List.find(ENV['TRELLO_LIST_ID'])
   end
 
   def initialize(filename)
@@ -47,9 +41,10 @@ class TrelloSlurper
   end
 
   def configure_trello
-    Trello::Authorization.const_set :AuthPolicy, OAuthPolicy
-    OAuthPolicy.consumer_credential = OAuthCredential.new PUBLIC_KEY, SECRET
-    OAuthPolicy.token = OAuthCredential.new ACCESS_TOKEN_KEY, nil
+    Trello.configure do |config|
+      config.developer_public_key = ENV['TRELLO_DEVELOPER_PUBLIC_KEY']
+      config.member_token = ENV['TRELLO_MEMBER_TOKEN']
+    end
   end
 
   def load_stories
@@ -63,26 +58,27 @@ class TrelloSlurper
     @cards = @stories.map do |story|
       puts "Adding story \"#{story.name}\""
       card = Card.create({
-        list_id: LIST_ID,
+        list_id: ENV['TRELLO_LIST_ID'],
         name: story.name,
-        description: story.description
+        desc: story.description
       })
     end
   end
 
-  def add_labels
-    @cards.map { |card| card.add_label(LABEL_COLOR) }
-  end
-
 end
 
-class Story
-  attr_reader :name, :description
-
-  def initialize(hash)
-    @name = hash['name']
-    @description = hash['description']
-  end
+if ARGV.first.nil?
+  puts "Run the following to get started:"
+  puts "ruby ./trello_slurper.rb config"
+  puts "Or pass a yaml file path if you've done that"
+elsif ARGV.first == 'config'
+  puts "Agree to the terms and copy the key, then run:"
+  puts "TRELLO_DEVELOPER_PUBLIC_KEY=<that key> ruby ./trello_slurper.rb token"
+  Trello.open_public_key_url
+elsif ARGV.first == 'token'
+  puts "Now copy the member token and use both ENV variables:"
+  puts "TRELLO_DEVELOPER_PUBLIC_KEY=#{ENV['TRELLO_DEVELOPER_PUBLIC_KEY']} TRELLO_MEMBER_TOKEN=<that token> TRELLO_BOARD_ID=<board_id> TRELLO_LIST_ID=<list_id> ruby ./trello_slurper.rb your_stories.yml"
+  Trello.open_authorization_url key: ENV['TRELLO_DEVELOPER_PUBLIC_KEY']
+else
+  TrelloSlurper.slurp(File.join(Dir.pwd, ARGV.first))
 end
-
-TrelloSlurper.slurp(File.join(Dir.pwd, ARGV.first))
