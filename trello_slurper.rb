@@ -14,7 +14,11 @@ require 'yaml'
 include Trello
 include Trello::Authorization
 
-class Story < OpenStruct; end
+class Story < OpenStruct
+  def labels
+    (super || '').split(/,\s*/)
+  end
+end
 
 class TrelloSlurper
 
@@ -30,6 +34,12 @@ class TrelloSlurper
 
   def board
     @board ||= Board.find(ENV['TRELLO_BOARD_ID'])
+  end
+
+  def labels_for(story)
+    story.labels.map do |label_string|
+      board.labels.find {|x| x.name.downcase.strip == label_string.downcase.strip }
+    end.compact
   end
 
   def list
@@ -60,8 +70,9 @@ class TrelloSlurper
       card = Card.create({
         list_id: ENV['TRELLO_LIST_ID'],
         name: story.name,
-        desc: story.description
+        desc: story.description,
       })
+      labels_for(story).map {|l| card.add_label(l) }
     end
   end
 

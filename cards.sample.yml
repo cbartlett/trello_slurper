@@ -1,4 +1,5 @@
 name: Sample story
+labels: blocked, something_missing
 description: |
   Some text here
   Details, description, etc.
