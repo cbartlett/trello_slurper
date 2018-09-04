@@ -1,6 +1,15 @@
-require 'yaml'
-require 'pry'
+require 'bundler/inline'
+
+gemfile do
+  source 'http://rubygems.org'
+  ruby '2.4.3'
+  gem 'launchy'
+  gem 'pry'
+  gem 'ruby-trello'
+end
+
 require 'trello'
+require 'yaml'
 
 include Trello
 include Trello::Authorization
