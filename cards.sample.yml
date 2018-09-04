@@ -1,12 +1,15 @@
 name: Sample story
 description: |
-  * Given
-  * When
-  * Then
+  Some text here
+  Details, description, etc.
 
 ==
 name: Another sample story
 description: |
+  More text here
+
+  You can use line breaks and even bullets:
+
   * Given
   * When
   * Then
