@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-ruby '1.9.3'
+ruby '2.4.3'
 
 gem 'pry'
 gem 'ruby-trello'
