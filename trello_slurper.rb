@@ -61,7 +61,8 @@ class TrelloSlurper
     @stories = IO.read(@filename).
       split('==').
       map { |text| YAML.load(text) }.
-      map { |hash| Story.new(hash) }
+      map { |hash| Story.new(hash) }.
+      reverse
   end
 
   def push_stories
