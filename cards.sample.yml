@@ -16,3 +16,10 @@ description: |
   * Then
 attachments:
   - tmp/screenshot.png
+comments:
+  - "Question: Should we do whatever?"
+  - Some detailed information here.
+  - |
+    Another comment goes here.
+
+    This one has line breaks!

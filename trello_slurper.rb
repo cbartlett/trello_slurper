@@ -27,6 +27,10 @@ class Story < OpenStruct
       ]
     end
   end
+
+  def comments
+    Array(super)
+  end
 end
 
 class TrelloSlurper
@@ -84,6 +88,9 @@ class TrelloSlurper
       labels_for(story).map {|l| card.add_label(l) }
       story.attachments.each do |file, name|
         card.add_attachment(file, name)
+      end
+      story.comments.each do |text|
+        card.add_comment(text)
       end
     end
   end
