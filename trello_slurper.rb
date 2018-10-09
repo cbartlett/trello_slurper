@@ -28,7 +28,6 @@ class TrelloSlurper
 
   def slurp
     configure_trello
-    load_stories
     push_stories
   end
 
@@ -57,8 +56,8 @@ class TrelloSlurper
     end
   end
 
-  def load_stories
-    @stories = IO.read(@filename).
+  def stories
+    @stories ||= IO.read(@filename).
       split('==').
       map { |text| YAML.load(text) }.
       map { |hash| Story.new(hash) }.
@@ -66,7 +65,7 @@ class TrelloSlurper
   end
 
   def push_stories
-    @cards = @stories.map do |story|
+    @cards = stories.map do |story|
       puts "Adding story \"#{story.name}\""
       card = Card.create({
         list_id: ENV['TRELLO_LIST_ID'],
