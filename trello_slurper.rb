@@ -18,6 +18,15 @@ class Story < OpenStruct
   def labels
     (super || '').split(/,\s*/)
   end
+
+  def attachments
+    Array(super).map do |path|
+      [
+        File.open(path),
+        File.basename(path)
+      ]
+    end
+  end
 end
 
 class TrelloSlurper
@@ -73,6 +82,9 @@ class TrelloSlurper
         desc: story.description,
       })
       labels_for(story).map {|l| card.add_label(l) }
+      story.attachments.each do |file, name|
+        card.add_attachment(file, name)
+      end
     end
   end
 
